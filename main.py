@@ -1,5 +1,6 @@
 import time
 
+from mandelbrot_multiprocessing import parallel_mandelbrot, test_parallel_mandelbrot
 from mandelbrot_naive import naive_mandelbrot
 from mandelbrot_numba import numba_mandelbrot
 from mandelbrot_numpyVector import vectorized_mandelbrot
@@ -29,5 +30,10 @@ if __name__ == "__main__":
     # M2 = time_execution(numba_mandelbrot, C)
     # plot_mandelbrot(M2)
 
-    M3 = time_execution(vectorized_mandelbrot, C)
-    plot_mandelbrot(M3)
+    # M3 = time_execution(vectorized_mandelbrot, C)
+    # plot_mandelbrot(M3)
+
+    M4 = time_execution(parallel_mandelbrot, C)
+    plot_mandelbrot(M4)
+
+    # test_parallel_mandelbrot(C, num_iterations, T)
