@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from util import is_stable
 
 default_num_processes = 8
-default_num_chunks = 1
+default_num_chunks = 8
 
 
-def mandelbrot_chunk(C_chunk, num_iterations, T):
+def mandelbrot_chunk(args):
+    C_chunk, num_iterations, T = args
     M_chunk = np.zeros(C_chunk.shape)
 
     for i in range(C_chunk.shape[0]):
@@ -19,32 +20,19 @@ def mandelbrot_chunk(C_chunk, num_iterations, T):
     return M_chunk
 
 
-def split_into_blocks(C, n):
-    p_im, p_re = C.shape
-    block_height = int(np.sqrt(p_im * p_re / n))
-    block_width = block_height
-
-    blocks = []
-    positions = []
-    for i in range(0, p_im, block_height):
-        for j in range(0, p_re, block_width):
-            block = C[i:min(i + block_height, p_im), j:min(j + block_width, p_re)]
-            blocks.append(block)
-            positions.append((i, j))  # Store the top-left position of the block
-    return blocks, positions
+def process_chunk(args):
+    C_chunk, num_iterations, T = args
+    return is_stable(C_chunk, num_iterations, T)
 
 
 def parallel_mandelbrot(C, num_iterations, T, p=default_num_processes, n=default_num_chunks):
-    blocks, positions = split_into_blocks(C, n)
-    args_for_pool = [(block, num_iterations, T) for block in blocks]
+    rows, cols = C.shape
+    args_list = [(C[i,j], num_iterations, T) for i in range(rows) for j in range(cols)]
 
     with Pool(processes=p) as pool:
-        results = pool.starmap(mandelbrot_chunk, args_for_pool)
+        results = pool.starmap(is_stable, args_list)
 
-    # Reassemble the results into a new matrix of the same shape as C
-    M = np.zeros_like(C, dtype=float)
-    for (block, (i, j)) in zip(results, positions):
-        M[i:i + block.shape[0], j:j + block.shape[1]] = block
+    M = np.array(results).reshape(rows, cols)
 
     return M
 

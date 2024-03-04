@@ -1,4 +1,5 @@
 import time
+from multiprocessing import Pool
 
 from mandelbrot_multiprocessing import parallel_mandelbrot, test_parallel_mandelbrot
 from mandelbrot_naive import naive_mandelbrot
@@ -26,7 +27,7 @@ if __name__ == "__main__":
 
     # M1 = time_execution(naive_mandelbrot, C)
     # plot_mandelbrot(M1)
-    #
+
     # M2 = time_execution(numba_mandelbrot, C)
     # plot_mandelbrot(M2)
 
