@@ -17,7 +17,7 @@ def vectorized_mandelbrot(C, num_iterations, T):
         escape_mask = (np.abs(Z) > T) & (M == num_iterations)
         M[escape_mask] = i
 
-    # Normalize the escape counts to get a gradient effect
+    # Normalize the escape counts
     M /= num_iterations
 
     return M

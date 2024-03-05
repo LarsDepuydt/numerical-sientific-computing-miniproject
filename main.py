@@ -25,16 +25,16 @@ def time_execution(function, C):
 if __name__ == "__main__":
     C = complex_matrix(x_min, x_max, y_min, y_max, p_im, p_re)
 
-    # M1 = time_execution(naive_mandelbrot, C)
-    # plot_mandelbrot(M1)
+    M1 = time_execution(naive_mandelbrot, C)
+    plot_mandelbrot(M1)
 
     M2 = time_execution(numba_mandelbrot, C)
-    # plot_mandelbrot(M2)
+    plot_mandelbrot(M2)
 
-    # M3 = time_execution(vectorized_mandelbrot, C)
-    # plot_mandelbrot(M3)
+    M3 = time_execution(vectorized_mandelbrot, C)
+    plot_mandelbrot(M3)
 
-    # M4 = time_execution(parallel_mandelbrot, C)
-    # plot_mandelbrot(M4)
+    M4 = time_execution(parallel_mandelbrot, C)
+    plot_mandelbrot(M4)
 
-    # test_parallel_mandelbrot(C, num_iterations, T)
+    test_parallel_mandelbrot(C, num_iterations, T)
