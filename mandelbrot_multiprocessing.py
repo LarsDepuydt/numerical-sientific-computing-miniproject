@@ -20,25 +20,35 @@ def mandelbrot_chunk(args):
     return M_chunk
 
 
-def process_chunk(args):
-    C_chunk, num_iterations, T = args
-    return is_stable(C_chunk, num_iterations, T)
+def split_into_horizontal_chunks(C, num_chunks):
+    total_rows = C.shape[0]
+    chunk_height = total_rows // num_chunks
+    # Ensure all rows are covered by adding the remainder to the last chunk
+    chunks = [C[i * chunk_height: (i + 1) * chunk_height, :] for i in range(num_chunks - 1)]
+    # Add the last chunk, which includes any remaining rows
+    chunks.append(C[(num_chunks - 1) * chunk_height: total_rows, :])
+
+    return chunks
 
 
 def parallel_mandelbrot(C, num_iterations, T, p=default_num_processes, n=default_num_chunks):
-    rows, cols = C.shape
-    args_list = [(C[i,j], num_iterations, T) for i in range(rows) for j in range(cols)]
+    C_chunks = split_into_horizontal_chunks(C, n)
 
+    # Prepare arguments for each chunk
+    args_list = [(chunk, num_iterations, T) for chunk in C_chunks]
+
+    # Process each chunk in parallel
     with Pool(processes=p) as pool:
-        results = pool.starmap(is_stable, args_list)
+        M_chunks = pool.map(mandelbrot_chunk, args_list)
 
-    M = np.array(results).reshape(rows, cols)
+    # Reassemble the matrix from the chunks by stacking them vertically
+    M = np.vstack(M_chunks)
 
     return M
 
 
 def test_parallel_mandelbrot(C, num_iterations, T):
-    num_processes_values = [1, 2, 4, 8, 12, 16, 20, 30]
+    num_processes_values = [1, 2, 4, 8, 12, 16, 32]
     chunk_multipliers = [1, 2, 4]  # Example multipliers for the number of chunks
 
     plt.figure(figsize=(10, 6))
