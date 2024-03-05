@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from util import is_stable
 
 default_num_processes = 8
-default_num_chunks = 8
+default_num_chunks = 8*6
 
 
 def mandelbrot_chunk(args):
@@ -48,8 +48,8 @@ def parallel_mandelbrot(C, num_iterations, T, p=default_num_processes, n=default
 
 
 def test_parallel_mandelbrot(C, num_iterations, T):
-    num_processes_values = [1, 2, 4, 8, 12, 16, 32]
-    chunk_multipliers = [1, 2, 4]  # Example multipliers for the number of chunks
+    num_processes_values = [1, 2, 4, 8, 16]
+    chunk_multipliers = [1, 2, 4, 6, 8]  # Example multipliers for the number of chunks
 
     plt.figure(figsize=(10, 6))
 
