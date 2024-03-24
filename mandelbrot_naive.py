@@ -1,13 +1,23 @@
 import numpy as np
 
-from util import complex_matrix, is_stable, plot_mandelbrot
+from util import is_stable, is_stable_datatype
 
 
 def naive_mandelbrot(C, num_iterations, T):
-    M = np.zeros(C.shape)
+    M = np.zeros(C.shape, dtype=np.float16)
 
     for i in range(C.shape[0]):
         for j in range(C.shape[1]):
             M[i, j] = is_stable(C[i, j], num_iterations, T)
 
     return M
+
+def naive_mandelbrot_datatype(C_re, C_im, num_iterations, T, p_im, p_re):
+    M = np.zeros([p_im, p_re], dtype=np.float16)
+
+    for i in range(p_im):
+        for j in range(p_re):
+            M[i, j] = is_stable_datatype(C_im[i], C_re[j], num_iterations, T)
+
+    return M
+
