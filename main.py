@@ -12,7 +12,6 @@ x_min, x_max, y_min, y_max = -2.0, 1.0, -1.5, 1.5
 p_im, p_re = 8000, 8000
 num_iterations = 30
 T = 2
-dtype = np.float32  # np.float64
 dask_chunks = '50 MiB'
 
 def time_execution_datatype(function, C_re, C_im):

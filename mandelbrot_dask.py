@@ -22,19 +22,23 @@ def mandelbrot_block(C_chunk, num_iterations, T):
 
 
 def dask_vectorized_mandelbrot(C_chunk, num_iterations, T):
-    # Initialize Z (current value of iteration) and M (result matrix) as Dask arrays
     Z = da.zeros(C_chunk.shape, dtype=np.complex64)
-    M = da.full(C_chunk.shape, fill_value=num_iterations, dtype=np.float32)
+    M = da.full(C_chunk.shape, fill_value=num_iterations, dtype=np.float16)
+    diverged = da.zeros(C_chunk.shape, dtype=bool)  # Keep track of elements that have diverged
 
     for i in range(num_iterations):
-        not_escaped = da.abs(Z) <= T
-        Z = Z * not_escaped + (Z ** 2 + C_chunk) * not_escaped
-        escape_mask = (da.abs(Z) > T) & (M == num_iterations)
-        M = da.where(escape_mask, i, M)
+        # Perform the Mandelbrot iteration
+        Z = da.where(~diverged, Z ** 2 + C_chunk, 0)
+
+        # Update the diverged status
+        new_diverged = da.abs(Z) > T
+        diverged |= new_diverged  # Update elements that have diverged this iteration
+
+        # Update M only for newly diverged elements
+        M = da.where(new_diverged & (M == num_iterations), i, M)
 
     M /= num_iterations
     return M
-
 
 
 def compute_mandelbrot_dask(C_da, num_iterations, T):
