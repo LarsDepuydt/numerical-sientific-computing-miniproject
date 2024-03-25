@@ -1,7 +1,7 @@
 import dask.array as da
 from dask.distributed import Client
 import numpy as np
-import math
+import matplotlib.pyplot as plt
 import time
 
 from util import is_stable
@@ -31,7 +31,7 @@ def dask_vectorized_mandelbrot(C_chunk, num_iterations, T):
         Z = da.where(~diverged, Z ** 2 + C_chunk, 0)
 
         # Update the diverged status
-        new_diverged = da.abs(Z) > T
+        new_diverged = np.abs(Z) > T
         diverged |= new_diverged  # Update elements that have diverged this iteration
 
         # Update M only for newly diverged elements
@@ -56,31 +56,36 @@ def compute_mandelbrot_dask(C_da, num_iterations, T):
     return M, execution_time
 
 
-# def test_parallel_mandelbrot(C, num_iterations, T):
-#     num_processes_values = [1, 2, 4, 8, 16]
-#     chunk_multipliers = [1, 2, 4, 6, 8]  # Example multipliers for the number of chunks
-#
-#     plt.figure(figsize=(10, 6))
-#
-#     # Loop over each chunk multiplier
-#     for multiplier in chunk_multipliers:
-#         time_values = np.zeros(len(num_processes_values))
-#
-#         # Loop over each number of processes
-#         for i, n in enumerate(num_processes_values):
-#             start_time = time.time()
-#             # Use the multiplier to determine the number of chunks
-#             parallel_mandelbrot(C, num_iterations, T, p=n, n=n * multiplier)
-#             end_time = time.time()
-#
-#             time_values[i] = end_time - start_time
-#
-#         # Plot the current set of time values
-#         plt.plot(num_processes_values, time_values, marker='o', linestyle='-', label=f'Chunks x{multiplier}')
-#
-#     plt.xlabel('Number of Processes')
-#     plt.ylabel('Execution Time (seconds)')
-#     plt.legend()
-#     plt.grid(True)
-#     plt.xticks(num_processes_values)
-#     plt.show()
+def test_dask_mandelbrot(C, num_iterations, T):
+    # Range of chunk sizes to test
+    chunk_sizes = np.arange(10, 101, 10)  # 10 MiB to 100 MiB, inclusive
+    execution_times = []
+
+    for size in chunk_sizes:
+        times_for_size = []
+        for _ in range(3):  # Run each test 3 times
+            # Convert size to string format with MiB
+            dask_chunks = f"{size} MiB"
+
+            # Your grid creation might vary; ensure it accepts dask_chunks correctly
+            C_dask = create_complex_grid(C, dask_chunks)  # Adjust as per your function's definition
+
+            # Execute the Mandelbrot computation
+            _, ex_time = compute_mandelbrot_dask(C_dask, num_iterations, T)
+
+            # Collect execution time
+            times_for_size.append(ex_time)
+
+        # Store the average execution time for this chunk size
+        execution_times.append(np.mean(times_for_size))
+
+    # Plotting the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(chunk_sizes, execution_times, marker='o', linestyle='-')
+    plt.xlabel('Chunk Size (MiB)')
+    plt.ylabel('Average Execution Time (s)')
+    plt.title('Mandelbrot Computation Time vs. Dask Chunk Size')
+    plt.grid(True)
+    plt.show()
+
+

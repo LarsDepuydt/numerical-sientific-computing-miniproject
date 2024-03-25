@@ -1,7 +1,7 @@
 import time
 import numpy as np
 
-from mandelbrot_dask import create_complex_grid, compute_mandelbrot_dask
+from mandelbrot_dask import create_complex_grid, compute_mandelbrot_dask, test_dask_mandelbrot
 from mandelbrot_multiprocessing import parallel_mandelbrot, test_parallel_mandelbrot
 from mandelbrot_naive import naive_mandelbrot, naive_mandelbrot_datatype
 from mandelbrot_numba import numba_mandelbrot
@@ -12,7 +12,7 @@ x_min, x_max, y_min, y_max = -2.0, 1.0, -1.5, 1.5
 p_im, p_re = 8000, 8000
 num_iterations = 30
 T = 2
-dask_chunks = '50 MiB'
+dask_chunks = '70 MiB'
 
 def time_execution_datatype(function, C_re, C_im):
     start_time = time.time()
@@ -50,7 +50,9 @@ if __name__ == "__main__":
     #
     # test_parallel_mandelbrot(C, num_iterations, T)
 
-    C_dask = create_complex_grid(C, dask_chunks)
-    M5, ex_time = compute_mandelbrot_dask(C_dask, num_iterations, T)
-    print(f"Function executed in {ex_time} seconds.")
+    # C_dask = create_complex_grid(C, dask_chunks)
+    # M5, ex_time = compute_mandelbrot_dask(C_dask, num_iterations, T)
+    # print(f"Function executed in {ex_time} seconds.")
     # plot_mandelbrot(M5)
+
+    test_dask_mandelbrot(C, num_iterations, T)
