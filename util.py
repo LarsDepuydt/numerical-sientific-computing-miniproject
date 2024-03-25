@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def complex_matrix(x_min, x_max, y_min, y_max, p_im, p_re):
-    re = np.linspace(x_min, x_max, p_re)
-    im = np.linspace(y_min, y_max, p_im)
-    return re[np.newaxis, :] + im[:, np.newaxis] * 1j
+def complex_matrix(x_min, x_max, y_min, y_max, p_im, p_re, dtype):
+    re = np.linspace(x_min, x_max, p_re, dtype=np.float64)
+    im = np.linspace(y_min, y_max, p_im, dtype=np.float64)
+    return (re[np.newaxis, :] + im[:, np.newaxis] * 1j).astype(dtype)
 
 def complex_matrix_datatype(x_min, x_max, y_min, y_max, p_im, p_re, dtype):
     re = np.linspace(x_min, x_max, p_re, dtype=dtype)
