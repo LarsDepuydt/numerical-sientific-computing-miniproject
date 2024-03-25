@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-from util import is_stable
+from util import is_stable, complex_matrix
 
 
 def create_complex_grid(C, n_chunks):
@@ -42,7 +42,7 @@ def dask_vectorized_mandelbrot(C_chunk, num_iterations, T):
 
 
 def compute_mandelbrot_dask(C_da, num_iterations, T):
-    client = Client()
+    client = Client('130.225.37.203:8786')
     start_time = time.time()
 
     # Apply the Mandelbrot computation to each block
@@ -80,12 +80,29 @@ def test_dask_mandelbrot(C, num_iterations, T):
         execution_times.append(np.mean(times_for_size))
 
     # Plotting the results
+    print(chunk_sizes)
+    print(execution_times)
+
+
+def plot_result(input, result):
     plt.figure(figsize=(10, 6))
-    plt.plot(chunk_sizes, execution_times, marker='o', linestyle='-')
+    plt.plot(input, result, marker='o', linestyle='-')
     plt.xlabel('Chunk Size (MiB)')
     plt.ylabel('Average Execution Time (s)')
     plt.title('Mandelbrot Computation Time vs. Dask Chunk Size')
     plt.grid(True)
     plt.show()
 
+x_min, x_max, y_min, y_max = -2.0, 1.0, -1.5, 1.5
+p_im, p_re = 8000, 8000
+num_iterations = 30
+T = 2
+dask_chunks = '70 MiB'
 
+if __name__ == "__main__":
+    # C = complex_matrix(x_min, x_max, y_min, y_max, p_im, p_re)
+    # test_dask_mandelbrot(C, num_iterations, T)
+
+    chunk_sizes = np.arange(10, 101, 10)
+    result = [13.705414692560831, 12.032545328140259, 11.73614796002706, 11.343377431233725, 11.267307360967001, 11.187105973561605, 10.476410865783691, 10.52314289410909, 10.668972969055176, 10.61794638633728]
+    plot_result(chunk_sizes, result)
