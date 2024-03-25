@@ -17,10 +17,10 @@ def chunk_mandelbrot(C_chunk, num_iterations, T):
     diverged = da.zeros(C_chunk.shape, dtype=bool)  # Keep track of elements that have diverged
 
     for i in range(num_iterations):
-        # Perform the Mandelbrot iteration
+        # Perform the Mandelbrot iteration, only where it's not diverged yet
         Z = da.where(~diverged, Z ** 2 + C_chunk, 0)
 
-        # Update the diverged status
+        # Update the diverged status to optimize performance
         new_diverged = np.abs(Z) > T
         diverged |= new_diverged  # Update elements that have diverged this iteration
 

@@ -13,6 +13,8 @@ def is_stable(c, num_iterations, T):
 
     for i in range(num_iterations):
         z = z ** 2 + c
+
+        # We return early if we hit the threshold and not waste any time
         if abs(z) > T:
             return i / num_iterations
 
